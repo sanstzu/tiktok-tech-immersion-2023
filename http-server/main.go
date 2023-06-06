@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/TikTokTechImmersion/assignment_demo_2023/http-server/kitex_gen/rpc"
@@ -50,9 +52,9 @@ func sendMessage(ctx context.Context, c *app.RequestContext) {
 	}
 	resp, err := cli.Send(ctx, &rpc.SendRequest{
 		Message: &rpc.Message{
-			Chat:   req.Chat,
-			Text:   req.Text,
-			Sender: req.Sender,
+			Chat:   fmt.Sprintf("%s:%s", c.Query("sender"), c.Query("receiver")),
+			Text:   c.Query("text"),
+			Sender: c.Query("sender"),
 		},
 	})
 	if err != nil {
@@ -72,11 +74,48 @@ func pullMessage(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	var cursor int64
+	var limit int32
+	var reverse bool
+
+	if c.Query("cursor") == "" {
+		cursor = 0
+	} else {
+		cursor, err = strconv.ParseInt(c.Query("cursor"), 10, 64)
+
+		if err != nil {
+			c.String(consts.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+
+	if c.Query("limit") == "" {
+		limit = 10
+	} else {
+		limit64, err := strconv.ParseInt(c.Query("limit"), 10, 32)
+		limit = int32(limit64)
+
+		if err != nil {
+			c.String(consts.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+
+	if c.Query("reverse") == "" {
+		reverse = false
+	} else {
+		reverse, err = strconv.ParseBool(c.Query("reverse"))
+		if err != nil {
+			c.String(consts.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+
 	resp, err := cli.Pull(ctx, &rpc.PullRequest{
-		Chat:    req.Chat,
-		Cursor:  req.Cursor,
-		Limit:   req.Limit,
-		Reverse: &req.Reverse,
+		Chat:    c.Query("chat"),
+		Cursor:  cursor,
+		Limit:   limit,
+		Reverse: &reverse,
 	})
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
