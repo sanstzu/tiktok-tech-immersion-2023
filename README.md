@@ -52,13 +52,18 @@ There are two endpoints in the HTTP server:
     ```
     git clone https://github.com/sanstzu/tiktok-tech-immersion-2023
     ```
-
-2. Build the Docker container inside the repository folder
+    
+2. Build the MySQL service in the Docker container and initialize it
+    ```
+    docker-compose up mysql --build
+    ```
+   
+3. Build the Docker container inside the repository folder
     ```
     docker-compose up --build
     ```
 
-3. Once it is build, the four images should be running and the endpoint should be accessible. To test, simply open the URL/perform a `GET` request on `localhost:8080/ping`, which should return:
+4. Once it is build, the four images should be running and the endpoint should be accessible. To test, simply open the URL/perform a `GET` request on `localhost:8080/ping`, which should return:
     ```json
     {
         "message": "pong"
