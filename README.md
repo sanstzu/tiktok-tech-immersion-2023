@@ -31,6 +31,8 @@ There are two endpoints in the HTTP server:
             "send_time": int64,
         }
     ```
+    
+    However if the number of messages after the `cursor` is larger than `limit`, then it would also return `next_cursor` alongside the array of JSON, which is the `timestamp+1` of the last message.
 
 - `/api/send`
 
