@@ -27,7 +27,7 @@ services:
     ports:
       - "2379:2379"
   mysql:
-    image: mysql:5.7.42
+    image: mysql:latest
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
